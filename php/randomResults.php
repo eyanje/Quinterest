@@ -1,24 +1,27 @@
 <?php
+
+return "frick";
+return;
  
 /* Connect to mySQL database */  
-mysql_connect("****","****","****");
-mysql_select_db("****");
+mysqli_connect("****","****","****");
+mysqli_select_db("****");
 
 /* Get input data */
 $amount = $_GET['amount'];
-mysql_real_escape_string($amount);
+mysqli_real_escape_string($amount);
 $tossupAmount = $amount;
 $bonusAmount = $amount;
 $sub = $_GET['sub'];
-mysql_real_escape_string($sub);
+mysqli_real_escape_string($sub);
 $qtype = $_GET['qtype'];
-mysql_real_escape_string($qtype);
+mysqli_real_escape_string($qtype);
 $cat = $_GET ['categ'];
-mysql_real_escape_string($cat);
+mysqli_real_escape_string($cat);
 $dif = $_GET['difficulty'];
-mysql_real_escape_string($dif);
+mysqli_real_escape_string($dif);
 $tournamentyear = $_GET ['tournamentyear'];
-mysql_real_escape_string($tournamentyear);
+mysqli_real_escape_string($tournamentyear);
 
 /* Check question type */
 $tossup = false;
@@ -78,8 +81,8 @@ if ($tossup == true) {
 
 	/* Run Query */
 	$query ="SELECT * FROM tossupsdbnew WHERE ID LIKE '%%%%' $newvar $subvar $difvar $tournamentvar";
-	$getQuery = mysql_query($query);
-	$resultsSize = mysql_num_rows($getQuery);
+	$getQuery = mysqli_query($query);
+	$resultsSize = mysqli_num_rows($getQuery);
 
     /* Displaying the number of results */
     if ($resultsSize == 0) {
@@ -113,8 +116,8 @@ if ($tossup == true) {
 
 
         $singleResult = $query . " LIMIT $offset, 1";
-        $getQuery = mysql_query($singleResult);
-        $row = mysql_fetch_array($getQuery);
+        $getQuery = mysqli_query($singleResult);
+        $row = mysqli_fetch_array($getQuery);
 
         $id = $row['ID'];
         $answer = stripslashes($row['Answer']);
@@ -155,8 +158,8 @@ if ($bonus == true) {
     ";
 
 	$query ="SELECT * FROM bonusesdb WHERE ID LIKE '%%%%' $newvar $subvar $difvar $tournamentvar"; //completed search query
-    $getQuery = mysql_query($query);
-    $resultsSize = mysql_num_rows($getQuery);
+    $getQuery = mysqli_query($query);
+    $resultsSize = mysqli_num_rows($getQuery);
     
 
     /* Displaying the number of results */
@@ -191,8 +194,8 @@ if ($bonus == true) {
         $offsets[$resultsCounter - 1] = $offset;
 
         $singleResult = $query . " LIMIT $offset, 1";
-        $getQuery = mysql_query($singleResult);
-        $row = mysql_fetch_array($getQuery);
+        $getQuery = mysqli_query($singleResult);
+        $row = mysqli_fetch_array($getQuery);
 
 
         $a1 = stripslashes($row['Answer1']);
