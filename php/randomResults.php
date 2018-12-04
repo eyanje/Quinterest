@@ -1,7 +1,5 @@
 <?php
 
-return "frick";
-return;
  
 /* Connect to mySQL database */  
 mysqli_connect("****","****","****");
