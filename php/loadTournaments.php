@@ -5,8 +5,8 @@
 
 session_start();
 /* Connect to SQL Database */ 
-$dbc = mysql_connect("****","****","****") OR die ('Could not connect to MySQL: ' . mysql_error() ); 
-mysql_select_db("****") OR die ('Could not select the database: ' . mysql_error() );
+$dbc = mysqli_connect("****","****","****") OR die ('Could not connect to MySQL: ' . mysql_error() ); 
+mysqli_select_db($dbc, "****") OR die ('Could not select the database: ' . mysql_error() );
 
 /* Get the Question Type */
 $qtype = $_GET['qtype'];
@@ -16,7 +16,7 @@ if ($qtype == "Bonuses") {
 	$query = "SELECT `Difficulty`, `Tournament`, `Year` FROM `tossupsdbnew` GROUP BY `Tournament`, `Year`";
 }
 
-$result = mysql_query($query); // Get results from database query
+$result = mysqli_query($dbc, $query); // Get results from database query
 
 /* Get the input difficulty */
 $difficulty = $_GET['difficulty'];
@@ -28,7 +28,7 @@ $years = array();
 $names = array();
 
 /* Add data from results to arrays */
-while ($row = mysql_fetch_array($result, MYSQL_BOTH)){ 
+while ($row = mysqli_fetch_array($result, MYSQL_BOTH)){ 
 	$name = $row[2] . " " . $row[1];
 	array_push($names, $name);
 	array_push($difficulties, $row[0]);

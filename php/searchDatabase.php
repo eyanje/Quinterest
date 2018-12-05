@@ -1,34 +1,34 @@
 <?php
 
 /* Connecting to mySQL database */
-mysqli_connect("****","****","****");
-mysqli_select_db("****");
+$link = mysqli_connect("****","****","****");
+mysqli_select_db($link, "****");
 
 $tossup = false;
 $bonus = false;
 
 /* Get Inputs */
 $qtype = $_GET ['qtype'];
-mysqli_real_escape_string($qtype);
+mysqli_real_escape_string($link, $qtype);
 
 $cat = $_GET['categ'];
-mysqli_real_escape_string($cat);
+mysqli_real_escape_string($link, $cat);
 
 $sub = $_GET['sub'];
-mysqli_real_escape_string($sub);
+mysqli_real_escape_string($link, $sub);
 
 $dif = $_GET['difficulty'];
-mysqli_real_escape_string($dif);
+mysqli_real_escape_string($link, $dif);
 
 $tournamentyear = $_GET['tournamentyear'];
-mysqli_real_escape_string($tournamentyear);
+mysqli_real_escape_string($link, $tournamentyear);
 
 $search = stripslashes($_GET['info']);
-mysqli_real_escape_string($search);
+mysqli_real_escape_string($link, $search);
 $search_exploded = explode(" ", $search);
 
 $stype = $_GET['stype'];
-mysqli_real_escape_string($stype);
+mysqli_real_escape_string($link, $stype);
 
 if ($_GET['limit'] == "yes") {
     $limit = true;
@@ -100,9 +100,9 @@ if ($tossup == true) {
 
     if ($limit == true) {
         /* Querying the database */
-        $getquery = mysqli_query($constructs);
+        $getquery = mysqli_query($link, $constructs);
         $foundnum = mysqli_num_rows($getquery);
-        $getquery = mysqli_query($constructs . " LIMIT 10");
+        $getquery = mysqli_query($link, $constructs . " LIMIT 10");
     
         /* Display Number of Results */
         echo "
@@ -122,7 +122,7 @@ if ($tossup == true) {
             </center></div></div><hr>
         ";
     } else {
-        $getquery = mysqli_query($constructs . " LIMIT 10, 18446744073709551615"); // Skips First 10 Rows
+        $getquery = mysqli_query($link, $constructs . " LIMIT 10, 18446744073709551615"); // Skips First 10 Rows
     }
     
     /* Displaying Results */ 
@@ -259,9 +259,9 @@ if ($bonus == true) {
     
     if ($limit == true) {
         /* Query the Database */
-        $getquery = mysqli_query($constructs);
+        $getquery = mysqli_query($link, $constructs);
         $foundnum = mysqli_num_rows($getquery);
-        $getquery = mysqli_query($constructs . " LIMIT 10");
+        $getquery = mysqli_query($link, $constructs . " LIMIT 10");
     
         /* Display Number of Results */
         echo "
@@ -281,7 +281,7 @@ if ($bonus == true) {
             </center></div></div><hr>
         ";
     } else {
-        $getquery = mysqli_query($constructs . " LIMIT 10, 18446744073709551615"); // Skips First 10 Rows
+        $getquery = mysqli_query($link, $constructs . " LIMIT 10, 18446744073709551615"); // Skips First 10 Rows
     }
   
     /* Displaying Results */ 

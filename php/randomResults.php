@@ -2,24 +2,24 @@
 
  
 /* Connect to mySQL database */  
-mysqli_connect("****","****","****");
-mysqli_select_db("****");
+$link = mysqli_connect("****","****","****");
+mysqli_select_db($link, "****");
 
 /* Get input data */
 $amount = $_GET['amount'];
-mysqli_real_escape_string($amount);
+mysqli_real_escape_string($link, $amount);
 $tossupAmount = $amount;
 $bonusAmount = $amount;
 $sub = $_GET['sub'];
-mysqli_real_escape_string($sub);
+mysqli_real_escape_string($link, $sub);
 $qtype = $_GET['qtype'];
-mysqli_real_escape_string($qtype);
+mysqli_real_escape_string($link, $qtype);
 $cat = $_GET ['categ'];
-mysqli_real_escape_string($cat);
+mysqli_real_escape_string($link, $cat);
 $dif = $_GET['difficulty'];
-mysqli_real_escape_string($dif);
+mysqli_real_escape_string($link, $dif);
 $tournamentyear = $_GET ['tournamentyear'];
-mysqli_real_escape_string($tournamentyear);
+mysqli_real_escape_string($link, $tournamentyear);
 
 /* Check question type */
 $tossup = false;
@@ -79,7 +79,7 @@ if ($tossup == true) {
 
 	/* Run Query */
 	$query ="SELECT * FROM tossupsdbnew WHERE ID LIKE '%%%%' $newvar $subvar $difvar $tournamentvar";
-	$getQuery = mysqli_query($query);
+	$getQuery = mysqli_query($link, $query);
 	$resultsSize = mysqli_num_rows($getQuery);
 
     /* Displaying the number of results */
@@ -114,7 +114,7 @@ if ($tossup == true) {
 
 
         $singleResult = $query . " LIMIT $offset, 1";
-        $getQuery = mysqli_query($singleResult);
+        $getQuery = mysqli_query($link, $singleResult);
         $row = mysqli_fetch_array($getQuery);
 
         $id = $row['ID'];
@@ -156,7 +156,7 @@ if ($bonus == true) {
     ";
 
 	$query ="SELECT * FROM bonusesdb WHERE ID LIKE '%%%%' $newvar $subvar $difvar $tournamentvar"; //completed search query
-    $getQuery = mysqli_query($query);
+    $getQuery = mysqli_query($link, $query);
     $resultsSize = mysqli_num_rows($getQuery);
     
 
@@ -192,7 +192,7 @@ if ($bonus == true) {
         $offsets[$resultsCounter - 1] = $offset;
 
         $singleResult = $query . " LIMIT $offset, 1";
-        $getQuery = mysqli_query($singleResult);
+        $getQuery = mysqli_query($link, $singleResult);
         $row = mysqli_fetch_array($getQuery);
 
 
