@@ -19,8 +19,7 @@ For easy installation, copy the files from ./Quinterest-PHP7 to /var/www/html
 Next, install and enable the PHP and MySQL mods
 ```
 apt-get install php-fpm
-sudo apt-get install php libapache2-mod-php php-mcrypt php-mysql
-sudo a2enmod proxy_fcgi setenvif
+apt-get install php libapache2-mod-php php-mcrypt php-mysql a2enmod proxy_fcgi setenvif
 ```
 
 Start apache with `service start apache2`
@@ -28,10 +27,18 @@ Quinterest should now be running at `http://localhost/`
 
 ## Creating the database
 
-Quinterest requires a database of questions to use.
-If anyone figures out how to do this, please message me.
+First open mysql by running
+```
+mysql
+```
+This may require root permissions.
 
+To create the database, run
+```
+source db/createdatabase
+source db/createtossupstable
+source db/createbonustable
+```
+This creates the database with empty tables.
 
-
-
-
+As of now, there is no automated table updating.

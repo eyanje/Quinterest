@@ -1,0 +1,3 @@
+CREATE DATABASE quizbowl;
+
+GRANT ALL PRIVILEGES ON quizbowl.* TO 'quizbowl'@'localhost';
