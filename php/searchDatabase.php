@@ -1,11 +1,12 @@
 <?php
 
 /* Connecting to mySQL database */
-$link = mysqli_connect("****","****","****");
-mysqli_select_db($link, "****");
+$link = mysqli_connect("127.0.0.1",
+    "quizbowl", "quizbowl",
+    "quizbowl");
 
-$tossup = false;
-$bonus = false;
+$tossup = FALSE;
+$bonus = FALSE;
 
 /* Get Inputs */
 $qtype = $_GET ['qtype'];
@@ -30,52 +31,47 @@ $search_exploded = explode(" ", $search);
 $stype = $_GET['stype'];
 mysqli_real_escape_string($link, $stype);
 
-if ($_GET['limit'] == "yes") {
-    $limit = true;
-} else {
-    $limit = false;
-}
+$limit = $_GET['limit'] == "yes";
 
 /* Get Question Type */
-$qtype = $_GET ['qtype'];
 if ($qtype == "TossupBonus") {
-    $tossup = true;
-    $bonus = true;
+    $tossup = TRUE;
+    $bonus = TRUE;
 } else if ($qtype == "Tossups") {
-    $tossup = true;
+    $tossup = TRUE;
 } else {
-    $bonus = true;
+    $bonus = TRUE;
 }
 
 /* Check Category */
 if ($cat == "All") {
-    $newvar = "";
+    $categquery = "";
 } else {
-    $newvar = "AND Category = '$cat'";
+    $categquery = "AND Category = '$cat'";
 }
 
 /* Check Subcategory */
 if( $sub=="None" || $sub=="All") {
-    $subvar = "";
+    $subcategquery = "";
 } else {
-    $subvar = "AND Subcategory = '$sub'";
+    $subcategquery = "AND Subcategory = '$sub'";
 }
 
 /* Check Difficulty */
 if( $dif == "All") {
-    $difvar = "";
+    $difquery = "";
 } else {
-    $difvar = "AND Difficulty = '$dif'";
+    $difquery = "AND Difficulty = '$dif'";
 }
 
 /* Check Tournament and Year */
 if($tournamentyear == "All") {
-    $tournamentvar = "";
+    $tournamentquery = "";
 } else {
     $explode = explode(',', $tournamentyear);
     $tvalue = $explode[0];
     $yvalue = $explode[1];
-    $tournamentvar = "AND (Tournament = '$tvalue' AND Year = '$yvalue')";
+    $tournamentquery = "AND (Tournament = '$tvalue' AND Year = '$yvalue')";
 }
 
 /************************/
@@ -85,6 +81,7 @@ if ($tossup == true) {
 
     /* Constructing Query */
     $construct = "";
+    $x = 0;
     foreach ($search_exploded as $search_each) { //loops through array
         $x++;
         if($x == 1) {
@@ -96,14 +93,13 @@ if ($tossup == true) {
     if($stype == "AnswerQuestion") {
         $construct .='OR (Question COLLATE utf8_general_ci LIKE _utf8"%' . $search . '%" COLLATE utf8_general_ci)';
     }
-    $constructs = "SELECT * FROM tossupsdbnew WHERE ($construct) $newvar $subvar $difvar $tournamentvar ORDER BY `Year` DESC,`Tournament` ASC,`Round` ASC,`Question #` ASC";
+    $constructs = "SELECT * FROM tossupsdbnew WHERE ($construct) $categquery $subcategquery $difquery $tournamentquery ORDER BY `Year` DESC,`Tournament` ASC,`Round` ASC,`Question #` ASC";
 
-    if ($limit == true) {
+    if ($limit == TRUE) {
         /* Querying the database */
         $getquery = mysqli_query($link, $constructs);
-        $foundnum = mysqli_num_rows($getquery);
-        $getquery = mysqli_query($link, $constructs . " LIMIT 10");
-    
+
+        
         /* Display Number of Results */
         echo "
             <div id='tossupResults'>
@@ -112,10 +108,14 @@ if ($tossup == true) {
                         <center>
         ";
 
-        if ($foundnum == 0) {
+        if ($getquery == FALSE) {
             echo "<p>Sorry, there are no matching tossups.</p>";
         } else {
+            $foundnum = mysqli_num_rows($getquery);
+            $getquery = mysqli_query($link, $constructs . " LIMIT 10");
+        
             echo "<p>$foundnum Tossups Were Found</p>";
+
         }
 
         echo "
@@ -125,62 +125,64 @@ if ($tossup == true) {
         $getquery = mysqli_query($link, $constructs . " LIMIT 10, 18446744073709551615"); // Skips First 10 Rows
     }
     
-    /* Displaying Results */ 
-    if ($limit == true) {     
-        $a = 1;
-    } else {
-        $a = 11;
-    }
+    if ($getquery != FALSE) {
+        /* Displaying Results */ 
+        if ($limit) {
+            $a = 1;
+        } else {
+            $a = 11;
+        }
 
-    while ($runrows = mysqli_fetch_array($getquery)) { // Fetching results
-        $id = $runrows['ID'];
-        $answer = stripslashes($runrows['Answer']);
-        $category = $runrows['Category'];
-        $subcategory = $runrows['Subcategory'];
-        $num = $runrows['Question #'];
-        $difficulty = $runrows['Difficulty'];
-        $question = stripslashes($runrows['Question']);
-        $round = $runrows['Round'];
-        $tournament = $runrows['Tournament'];
-        $year = $runrows['Year'];
+        while ($runrows = mysqli_fetch_array($getquery)) { // Fetching results
+            $id = $runrows['ID'];
+            $answer = stripslashes($runrows['Answer']);
+            $category = $runrows['Category'];
+            $subcategory = $runrows['Subcategory'];
+            $num = $runrows['Question #'];
+            $difficulty = $runrows['Difficulty'];
+            $question = stripslashes($runrows['Question']);
+            $round = $runrows['Round'];
+            $tournament = $runrows['Tournament'];
+            $year = $runrows['Year'];
 
-        // What will be displayed on the results page 
-        echo "
-            <div class='row'>
-                <div class='col-md-12'>
-                    <p><b>Result: $a | $tournament | $year | Round: $round | Question: $num | $category | $subcategory</b><span style='float: right'>ID: $id</span></p>
-                    <p><em>Question:</em> $question</p>
-                    <p><em><strong>ANSWER:</strong></em> $answer</p>
-                </div> 
-            </div>
-            <hr>
-        ";
-        $a++;
-    }
-
-    if ($limit == true) {
-        if ($foundnum > 10) {
+            // What will be displayed on the results page 
             echo "
-            <div id='loadAllTossups'>
                 <div class='row'>
                     <div class='col-md-12'>
-                        <center>
-                        <button type='button' id='loadAllTossupsButton' class='btn btn-lg btn-primary'>Load All Tossups</button>
-                        </center>
-                    </div>
+                        <p><b>Result: $a | $tournament | $year | Round: $round | Question: $num | $category | $subcategory</b><span style='float: right'>ID: $id</span></p>
+                        <p><em>Question:</em> $question</p>
+                        <p><em><strong>ANSWER:</strong></em> $answer</p>
+                    </div> 
                 </div>
                 <hr>
-            </div>
             ";
+            $a++;
         }
-        echo "</div> <!-- Closing tossupResults -->";
+
+        if ($limit) {
+            if ($foundnum > 10) {
+                echo "
+                <div id='loadAllTossups'>
+                    <div class='row'>
+                        <div class='col-md-12'>
+                            <center>
+                            <button type='button' id='loadAllTossupsButton' class='btn btn-lg btn-primary'>Load All Tossups</button>
+                            </center>
+                        </div>
+                    </div>
+                    <hr>
+                </div>
+                ";
+            }
+            echo "</div> <!-- Closing tossupResults -->";
+        }
     }
 }
 
 /***********************/
 /* BONUS QUESTION TYPE */
 /***********************/
-if ($bonus == true) {
+if ($bonus) {
 
     /* Constructing Bonus Query */
     $construct = "";   
@@ -221,49 +223,47 @@ if ($bonus == true) {
 
         $x = 1;
         foreach($search_exploded as $search_each) {
-            if($x==1) {
+            if($x == 1) {
                 $construct .='OR ((Question1 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
             } else {
                 $construct .='AND (Question1 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
             }
             $x++;
         }
-        $construct .=")";
+        $construct .= ")";
 
         $x = 1;
         foreach($search_exploded as $search_each) {
-            if($x==1) {
+            if($x == 1) {
                 $construct .='OR ((Question2 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
             } else {
                 $construct .='AND (Question2 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; 
             }
             $x++;
         }
-        $construct .=")";
+        $construct .= ")";
 
         $x = 1;
         foreach($search_exploded as $search_each) {
-            if($x==1) {
-                $construct .='OR ((Question3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            if($x == 1) {
+                $construct .= 'OR ((Question3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
             } else {
-                $construct .='AND (Question3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; 
+                $construct .= 'AND (Question3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; 
             }
             $x++;
         }
-        $construct .=")";
+        $construct .= ")";
 
-        $construct .='OR Intro COLLATE utf8_general_ci LIKE _utf8"%' . $search . '%" COLLATE utf8_general_ci';
+        $construct .= 'OR Intro COLLATE utf8_general_ci LIKE _utf8"%' . $search . '%" COLLATE utf8_general_ci';
     }
 
-    $constructs = "SELECT * FROM bonusesdb WHERE ($construct) $newvar $subvar $difvar $tournamentvar ORDER BY `Year` DESC,`Tournament` ASC,`Round` ASC,`Question #` ASC";
+    $constructs = "SELECT * FROM bonusesdb WHERE ($construct) $categquery $subcategquery $difquery $tournamentquery ORDER BY `Year` DESC,`Tournament` ASC,`Round` ASC,`Question #` ASC";
     
-    if ($limit == true) {
+    if ($limit) {
         /* Query the Database */
         $getquery = mysqli_query($link, $constructs);
-        $foundnum = mysqli_num_rows($getquery);
-        $getquery = mysqli_query($link, $constructs . " LIMIT 10");
     
-        /* Display Number of Results */
+        /* Display Results */
         echo "
             <div id='bonusResults'>
                 <div class='row'>
@@ -271,74 +271,84 @@ if ($bonus == true) {
                         <center>
         ";
 
-        if ($foundnum == 0) {
+        if ($getquery == FALSE) {
             echo "<p>Sorry, there are no matching bonuses.</p>";
         } else {
+            $foundnum = mysqli_num_rows($getquery);
+            
+            /* Only use the first 10 bonuses */
+            $getquery = mysqli_query($link, $constructs . " LIMIT 10");
+
             echo "<p>$foundnum bonuses Were Found</p>";
         }
-
+        
         echo "
             </center></div></div><hr>
         ";
+
     } else {
         $getquery = mysqli_query($link, $constructs . " LIMIT 10, 18446744073709551615"); // Skips First 10 Rows
     }
   
-    /* Displaying Results */ 
-    if ($limit == true) {     
-        $a = 1;
-    } else {
-        $a = 11;
-    }
-    while ($runrows = mysqli_fetch_array($getquery)) {
-        $a1 = stripslashes($runrows['Answer1']);
-        $a2 = stripslashes($runrows['Answer2']);
-        $a3 = stripslashes($runrows['Answer3']);
-        $category = $runrows['Category'];
-        $subcategory = $runrows['Subcategory'];
-        $num = $runrows['Question #'];
-        $difficulty = $runrows['Difficulty'];
-        $q1 = stripslashes($runrows['Question1']);
-        $q2 = stripslashes($runrows['Question2']);
-        $q3 = stripslashes($runrows['Question3']);
-        $intro = stripslashes($runrows ['Intro']);
-        $round = $runrows ['Round'];
-        $tournament = $runrows ['Tournament'];
-        $year = $runrows ['Year'];
-        $id = $runrows ['ID'];
-
-        echo "<div class='row'>
-                <div class='col-md-12'>
-                    <p><b>Result: $a | $tournament |$year | $round | $num | $category | $subcategory | $difficulty</b><span style='float: right'>ID: $id</span>
-                    <p><em>Question:</em> $intro </p>
-                    <p><strong>[10]</strong> $q1</p>
-                    <p><em><strong>ANSWER:</strong></em> $a1</p>
-                    <p><strong>[10]</strong> $q2</p>
-                    <p><em><strong>ANSWER:</strong></em> $a2</p>
-                    <p><strong>[10]</strong> $q3</p>
-                    <p><em><strong>ANSWER:</strong></em> $a3</p>
-                </div>
-            </div><hr>
-        ";
-        $a++;
-    }
-
-    if ($limit == true) {
-        if ($foundnum > 10) {
-            echo "
-                <div id='loadAllBonuses'>
-                    <div class='row'>
-                        <div class='col-md-12'>
-                            <center>
-                            <button type='button' id='loadAllBonusesButton' class='btn btn-lg btn-primary'>Load All Bonuses</button>
-                            </center>
-                        </div>
-                    </div>
-                    <hr>
-                </div>
-            ";
+    if ($getquery != FALSE) {
+        /* Displaying Results */ 
+        if ($limit) {     
+            $a = 1;
+        } else {
+            $a = 11;
         }
-        echo "</div> <!-- Closing bonusResults -->";
+        while ($runrows = mysqli_fetch_array($getquery)) {
+            $a1 = stripslashes($runrows['Answer1']);
+            $a2 = stripslashes($runrows['Answer2']);
+            $a3 = stripslashes($runrows['Answer3']);
+            $category = $runrows['Category'];
+            $subcategory = $runrows['Subcategory'];
+            $num = $runrows['Question #'];
+            $difficulty = $runrows['Difficulty'];
+            $q1 = stripslashes($runrows['Question1']);
+            $q2 = stripslashes($runrows['Question2']);
+            $q3 = stripslashes($runrows['Question3']);
+            $intro = stripslashes($runrows ['Intro']);
+            $round = $runrows ['Round'];
+            $tournament = $runrows ['Tournament'];
+            $year = $runrows ['Year'];
+            $id = $runrows ['ID'];
+
+            echo "<div class='row'>
+                    <div class='col-md-12'>
+                        <p><b>Result: $a | $tournament |$year | $round | $num | $category | $subcategory | $difficulty</b><span style='float: right'>ID: $id</span>
+                        <p><em>Question:</em> $intro </p>
+                        <p><strong>[10]</strong> $q1</p>
+                        <p><em><strong>ANSWER:</strong></em> $a1</p>
+                        <p><strong>[10]</strong> $q2</p>
+                        <p><em><strong>ANSWER:</strong></em> $a2</p>
+                        <p><strong>[10]</strong> $q3</p>
+                        <p><em><strong>ANSWER:</strong></em> $a3</p>
+                    </div>
+                </div><hr>
+            ";
+            $a++;
+        }
+    }
+
+    if ($limit) {
+        if ($getquery != FALsE) {
+            if ($foundnum > 10) {
+                echo "
+                    <div id='loadAllBonuses'>
+                        <div class='row'>
+                            <div class='col-md-12'>
+                                <center>
+                                <button type='button' id='loadAllBonusesButton' class='btn btn-lg btn-primary'>Load All Bonuses</button>
+                                </center>
+                            </div>
+                        </div>
+                        <hr>
+                    </div>
+                ";
+            }
+            echo "</div> <!-- Closing bonusResults -->";
+        }
     }
 }
 ?>

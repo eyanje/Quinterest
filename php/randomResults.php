@@ -2,8 +2,9 @@
 
  
 /* Connect to mySQL database */  
-$link = mysqli_connect("****","****","****");
-mysqli_select_db($link, "****");
+$link = mysqli_connect("127.0.0.1",
+    "quizbowl", "quizbowl",
+    "quizbowl");
 
 /* Get input data */
 $amount = $_GET['amount'];
@@ -22,53 +23,53 @@ $tournamentyear = $_GET ['tournamentyear'];
 mysqli_real_escape_string($link, $tournamentyear);
 
 /* Check question type */
-$tossup = false;
-$bonus = false;
+$tossup = FALSE;
+$bonus = FALSE;
 $qtype = $_GET ['qtype']; // Get Question Type
 if ($qtype == "TossupBonus") {
-    $tossup = true;
-    $bonus = true;
+    $tossup = TRUE;
+    $bonus = TRUE;
 } else if ($qtype == "Tossups") {
-    $tossup = true;
+    $tossup = TRUE;
 } else {
-    $bonus = true;
+    $bonus = TRUE;
 }
 
 /* Check category */
 if($cat=="All") {
-	$newvar = "";
+	$categquery = "";
 } else {
-	$newvar = "AND Category = '$cat'";
+	$categquery = "AND Category = '$cat'";
 }
 
 if ($sub == "None" || $sub == "All") {
-	$subvar = "";
+	$subcategquery = "";
 } else {
-	$subvar = "AND Subcategory = '$sub'";
+	$subcategquery = "AND Subcategory = '$sub'";
 }
 
 /* Check difficulty */
 if($dif=="All") {
-	$difvar = "";
+	$difquery = "";
 } else {
-	$difvar = "AND Difficulty = '$dif'";
+	$difquery = "AND Difficulty = '$dif'";
 }
 
 /* Check Tournament and Year */
 if ($tournamentyear == "All") {
-	$tournamentvar = "";
+	$tournamentquery = "";
 } else {
 	$explode = explode(',', $tournamentyear);
 	$tvalue = $explode[0];
 	$yvalue = $explode[1];
-	$tournamentvar = "AND (Tournament = '$tvalue' AND Year = '$yvalue')";
+	$tournamentquery = "AND (Tournament = '$tvalue' AND Year = '$yvalue')";
 }
 
 
 /************************/
 /* TOSSUP QUESTION TYPE */
 /************************/
-if ($tossup == true) {
+if ($tossup) {
 
     /* Open results div */
     echo "
@@ -78,18 +79,23 @@ if ($tossup == true) {
     ";
 
 	/* Run Query */
-	$query ="SELECT * FROM tossupsdbnew WHERE ID LIKE '%%%%' $newvar $subvar $difvar $tournamentvar";
-	$getQuery = mysqli_query($link, $query);
-	$resultsSize = mysqli_num_rows($getQuery);
+	$query ="SELECT * FROM tossupsdbnew WHERE ID LIKE '%%%%' $categquery $subcategquery $difquery $tournamentquery";
+    $getQuery = mysqli_query($link, $query);
+    
+    if ($getQuery == FALSE) {
+        $resultsSize = 0;
 
-    /* Displaying the number of results */
-    if ($resultsSize == 0) {
         echo "<p>Sorry, there are no matching tossups.</p>";
-    } else if ($resultsSize > $tossupAmount) {
-        echo "<p>$tossupAmount Random Tossups Were Found That Match Your Search Settings</p>";
     } else {
-        echo "<p>$resultsSize Random Tossups Were Found That Match Your Search Settings</p>";
-        $tossupAmount = $resultsSize; // If resultsSize is smaller, change amount.
+        $resultsSize = mysqli_num_rows($getQuery);
+        
+        /* Displaying the number of results */
+        if ($resultsSize > $tossupAmount) {
+            echo "<p>$tossupAmount Random Tossups Were Found That Match Your Search Settings</p>";
+        } else {
+            echo "<p>$resultsSize Random Tossups Were Found That Match Your Search Settings</p>";
+            $tossupAmount = $resultsSize; // If resultsSize is smaller, change amount.
+        }
     }
 
     /* Close results div */
@@ -115,38 +121,43 @@ if ($tossup == true) {
 
         $singleResult = $query . " LIMIT $offset, 1";
         $getQuery = mysqli_query($link, $singleResult);
-        $row = mysqli_fetch_array($getQuery);
+        if ($getQuery != FALSE) {
+            
+            $row = mysqli_fetch_array($getQuery);
+            
+            $id = $row['ID'];
+            $answer = stripslashes($row['Answer']);
+            $category = $row['Category'];
+            $subcategory = $row['Subcategory'];
+            $num = $row['Question #'];
+            $difficulty = $row['Difficulty'];
+            $question = stripslashes($row['Question']);
+            $round = $row['Round'];
+            $tournament = $row['Tournament'];
+            $year = $row['Year'];
 
-        $id = $row['ID'];
-        $answer = stripslashes($row['Answer']);
-        $category = $row['Category'];
-        $subcategory = $row['Subcategory'];
-        $num = $row['Question #'];
-        $difficulty = $row['Difficulty'];
-        $question = stripslashes($row['Question']);
-        $round = $row['Round'];
-        $tournament = $row['Tournament'];
-        $year = $row['Year'];
+            // What will be displayed on the results page 
+            echo "
+                <div class='row'>
+                    <div class='col-md-12'>
+                        <p><b>Result: $resultsCounter | $tournament | $year | $round | $num | $category | $subcategory</b><span style='float: right'>ID: $id</span></p>
+                        <p><em>Question:</em> $question</p>
+                        <p><em><strong>ANSWER:</strong></em> $answer</p>
+                    </div> 
+                </div>
+                <hr>
+            ";
+        }
 
-        // What will be displayed on the results page 
-        echo "
-            <div class='row'>
-                <div class='col-md-12'>
-                    <p><b>Result: $resultsCounter | $tournament | $year | $round | $num | $category | $subcategory</b><span style='float: right'>ID: $id</span></p>
-                    <p><em>Question:</em> $question</p>
-                    <p><em><strong>ANSWER:</strong></em> $answer</p>
-                </div> 
-            </div>
-            <hr>
-        ";
         $resultsCounter++;
+
     }
 }
 
 /***********************/
 /* BONUS QUESTION TYPE */
 /***********************/
-if ($bonus == true) {
+if ($bonus) {
 
     /* Open results div */
     echo "
@@ -155,20 +166,25 @@ if ($bonus == true) {
                 <center>
     ";
 
-	$query ="SELECT * FROM bonusesdb WHERE ID LIKE '%%%%' $newvar $subvar $difvar $tournamentvar"; //completed search query
+    $query = "SELECT * FROM bonusesdb WHERE ID LIKE '%%%%' $categquery $subcategquery $difquery $tournamentquery"; //completed search query
     $getQuery = mysqli_query($link, $query);
-    $resultsSize = mysqli_num_rows($getQuery);
     
+    if ($getQuery == FALSE) {
+        $resultsSize = 0;
 
-    /* Displaying the number of results */
-    if ($resultsSize == 0) {
         echo "<p>Sorry, there are no matching bonuses.</p>";
-    } else if ($resultsSize > $bonusAmount) {
-        echo "<p>$bonusAmount Random Bonuses Were Found That Match Your Search Settings</p>";
     } else {
-        echo "<p>$resultsSize Random Bonuses Were Found That Match Your Search Settings</p>";
-        $bonusAmount = $resultsSize; // If resultsSize is smaller, change amount.
+        $resultsSize = mysqli_num_rows($getQuery);
+        
+        /* Displaying the number of results */
+        if ($resultsSize > $bonusAmount) {
+            echo "<p>$bonusAmount Random Bonuses Were Found That Match Your Search Settings</p>";
+        } else {
+            echo "<p>$resultsSize Random Bonuses Were Found That Match Your Search Settings</p>";
+            $bonusAmount = $resultsSize; // If resultsSize is smaller, change amount.
+        }
     }
+
 
 
     /* Close results div */
@@ -193,38 +209,41 @@ if ($bonus == true) {
 
         $singleResult = $query . " LIMIT $offset, 1";
         $getQuery = mysqli_query($link, $singleResult);
-        $row = mysqli_fetch_array($getQuery);
 
+        if ($getQuery != FALSE) {
 
-        $a1 = stripslashes($row['Answer1']);
-        $a2 = stripslashes($row['Answer2']);
-        $a3 = stripslashes($row['Answer3']);
-        $category = $row['Category'];
-        $subcategory = $row['Subcategory'];
-        $num = $row['Question #'];
-        $difficulty = $row['Difficulty'];
-        $q1 = stripslashes($row['Question1']);
-        $q2 = stripslashes($row['Question2']);
-        $q3 = stripslashes($row['Question3']);
-        $intro = stripslashes($row['Intro']);
-        $round = $row['Round'];
-        $tournament = $row['Tournament'];
-        $year = $row['Year'];
-        $id = $row['ID'];
+            $row = mysqli_fetch_array($getQuery);
 
-        echo "<div class='row'>
-                <div class='col-md-12'>
-                    <p><b>Result: $resultsCounter | $tournament |$year | $round | $num | $category | $subcategory | $difficulty</b><span style='float: right'>ID: $id</span>
-                    <p><em>Question:</em> $intro </p>
-                    <p><strong>[10]</strong> $q1</p>
-                    <p><em><strong>ANSWER:</strong></em> $a1</p>
-                    <p><strong>[10]</strong> $q2</p>
-                    <p><em><strong>ANSWER:</strong></em> $a2</p>
-                    <p><strong>[10]</strong> $q3</p>
-                    <p><em><strong>ANSWER:</strong></em> $a3</p>
-                </div>
-            </div><hr>
-        ";   
+            $a1 = stripslashes($row['Answer1']);
+            $a2 = stripslashes($row['Answer2']);
+            $a3 = stripslashes($row['Answer3']);
+            $category = $row['Category'];
+            $subcategory = $row['Subcategory'];
+            $num = $row['Question #'];
+            $difficulty = $row['Difficulty'];
+            $q1 = stripslashes($row['Question1']);
+            $q2 = stripslashes($row['Question2']);
+            $q3 = stripslashes($row['Question3']);
+            $intro = stripslashes($row['Intro']);
+            $round = $row['Round'];
+            $tournament = $row['Tournament'];
+            $year = $row['Year'];
+            $id = $row['ID'];
+
+            echo "<div class='row'>
+                    <div class='col-md-12'>
+                        <p><b>Result: $resultsCounter | $tournament |$year | $round | $num | $category | $subcategory | $difficulty</b><span style='float: right'>ID: $id</span>
+                        <p><em>Question:</em> $intro </p>
+                        <p><strong>[10]</strong> $q1</p>
+                        <p><em><strong>ANSWER:</strong></em> $a1</p>
+                        <p><strong>[10]</strong> $q2</p>
+                        <p><em><strong>ANSWER:</strong></em> $a2</p>
+                        <p><strong>[10]</strong> $q3</p>
+                        <p><em><strong>ANSWER:</strong></em> $a3</p>
+                    </div>
+                </div><hr>
+            ";   
+        }
         $resultsCounter++;
     }
 }
