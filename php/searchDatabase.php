@@ -2,8 +2,8 @@
 
 /* Connecting to mySQL database */
 $link = mysqli_connect("127.0.0.1",
-    "quizbowl", "quizbowl",
-    "quizbowl");
+    "quinterestdb", "quinterestdb",
+    "quinterestdb");
 
 $tossup = FALSE;
 $bonus = FALSE;

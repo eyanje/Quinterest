@@ -27,18 +27,12 @@ Quinterest should now be running at `http://localhost/`
 
 ## Creating the database
 
-First open mysql by running
-```
-mysql
-```
-This may require root permissions.
+### Linux
 
-To create the database, run
-```
-source db/createdatabase
-source db/createtossupstable
-source db/createbonustable
-```
-This creates the database with empty tables.
+Run `./setupdb` to setup the database.
+
+### Windows
+
+Run `.\setupdb.bat` to setup the database.
 
 As of now, there is no automated table updating.

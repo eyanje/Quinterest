@@ -3,8 +3,8 @@
  
 /* Connect to mySQL database */  
 $link = mysqli_connect("127.0.0.1",
-    "quizbowl", "quizbowl",
-    "quizbowl");
+    "quinterestdb", "quinterestdb",
+    "quinterestdb");
 
 /* Get input data */
 $amount = $_GET['amount'];
