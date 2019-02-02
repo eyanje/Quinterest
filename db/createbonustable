@@ -1,0 +1,18 @@
+CREATE TABLE bonusesdb(
+    ID int NOT NULL AUTO_INCREMENT,
+    Answer1 varchar(255) NOT NULL,
+    Answer2 varchar(255) NOT NULL,
+    Answer3 varchar(255) NOT NULL,
+    Category varchar(255) NOT NULL,
+    Subcategory varchar(255) NOT NULL,
+    `Question #` int unsigned NOT NULL,
+    Difficulty int unsigned NOT NULL,
+    Question1 varchar(255) NOT NULL,
+    Question2 varchar(255) NOT NULL,
+    Question3 varchar(255) NOT NULL,
+    Intro varchar(255) NOT NULL,
+    Round int unsigned NOT NULL,
+    Tournament varchar(255) NOT NULL,
+    Year int unsigned NOT NULL,
+    PRIMARY KEY(ID)
+);

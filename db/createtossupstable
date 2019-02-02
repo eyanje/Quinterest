@@ -1,0 +1,13 @@
+CREATE TABLE tossupsdbnew(
+    ID int NOT NULL AUTO_INCREMENT,
+    Answer varchar(255) NOT NULL,
+    Category varchar(255) NOT NULL,
+    Subcategory varchar(255) NOT NULL,
+    `Question #` int unsigned NOT NULL,
+    Difficulty int unsigned NOT NULL,
+    Question varchar(255) NOT NULL,
+    Round int unsigned NOT NULL,
+    Tournament varchar(255) NOT NULL,
+    Year int unsigned NOT NULL,
+    PRIMARY KEY(ID)
+);
