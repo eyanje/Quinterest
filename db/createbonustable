@@ -6,7 +6,7 @@ CREATE TABLE bonusesdb(
     Category varchar(255) NOT NULL,
     Subcategory varchar(255) NOT NULL,
     `Question #` int unsigned NOT NULL,
-    Difficulty int unsigned NOT NULL,
+    Difficulty varchar(255) NOT NULL,
     Question1 varchar(255) NOT NULL,
     Question2 varchar(255) NOT NULL,
     Question3 varchar(255) NOT NULL,
