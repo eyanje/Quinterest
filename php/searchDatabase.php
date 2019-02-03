@@ -4,12 +4,9 @@
 $link = mysqli_connect("127.0.0.1",
     "quinterestdb", "quinterestdb",
     "quinterestdb");
-
-$tossup = FALSE;
-$bonus = FALSE;
-
-/* Get Inputs */
-$qtype = $_GET ['qtype'];
+    
+    /* Get Inputs */
+    $qtype = $_GET ['qtype'];
 mysqli_real_escape_string($link, $qtype);
 
 $cat = $_GET['categ'];
@@ -32,6 +29,9 @@ $stype = $_GET['stype'];
 mysqli_real_escape_string($link, $stype);
 
 $limit = $_GET['limit'] == "yes";
+
+$tossup = FALSE;
+$bonus = FALSE;
 
 /* Get Question Type */
 if ($qtype == "TossupBonus") {
@@ -84,21 +84,19 @@ if ($tossup == true) {
     $x = 0;
     foreach ($search_exploded as $search_each) { //loops through array
         $x++;
-        if($x == 1) {
-            $construct .='(Answer COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; //if only one value in array
-        } else {
-            $construct .='AND (Answer COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; //for each multiple value in array
+        if($x > 1) {
+            $construct .= 'AND ';
         }
+        $construct .='(Answer COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
     }
     if($stype == "AnswerQuestion") {
-        $construct .='OR (Question COLLATE utf8_general_ci LIKE _utf8"%' . $search . '%" COLLATE utf8_general_ci)';
+        $construct .= 'OR (Question COLLATE utf8mb4_general_ci LIKE "%' . $search . '%" COLLATE utf8mb4_general_ci)';
     }
     $constructs = "SELECT * FROM tossupsdbnew WHERE ($construct) $categquery $subcategquery $difquery $tournamentquery ORDER BY `Year` DESC,`Tournament` ASC,`Round` ASC,`Question #` ASC";
 
     if ($limit == TRUE) {
         /* Querying the database */
         $getquery = mysqli_query($link, $constructs);
-
         
         /* Display Number of Results */
         echo "
@@ -189,9 +187,9 @@ if ($bonus) {
     $x = 1;
     foreach ($search_exploded as $search_each) {
         if ($x == 1) {
-            $construct .='((Answer1 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            $construct .='((Answer1 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
         } else {
-            $construct .=' AND (Answer1 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            $construct .=' AND (Answer1 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
         }
         $x++;
     }
@@ -200,9 +198,9 @@ if ($bonus) {
     $x = 1;
     foreach($search_exploded as $search_each) {
         if($x==1) {
-            $construct .='OR ((Answer2 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            $construct .='OR ((Answer2 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
         } else {
-            $construct .=' AND (Answer2 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            $construct .=' AND (Answer2 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
         }
         $x++;
     }
@@ -211,9 +209,9 @@ if ($bonus) {
     $x = 1;
     foreach($search_exploded as $search_each) {
         if($x==1) {
-            $construct .='OR ((Answer3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            $construct .='OR ((Answer3 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
         } else {
-            $construct .=' AND (Answer3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+            $construct .=' AND (Answer3 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
         }
         $x++;
     }
@@ -224,9 +222,9 @@ if ($bonus) {
         $x = 1;
         foreach($search_exploded as $search_each) {
             if($x == 1) {
-                $construct .='OR ((Question1 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+                $construct .='OR ((Question1 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
             } else {
-                $construct .='AND (Question1 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+                $construct .='AND (Question1 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
             }
             $x++;
         }
@@ -235,9 +233,9 @@ if ($bonus) {
         $x = 1;
         foreach($search_exploded as $search_each) {
             if($x == 1) {
-                $construct .='OR ((Question2 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+                $construct .='OR ((Question2 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
             } else {
-                $construct .='AND (Question2 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; 
+                $construct .='AND (Question2 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)'; 
             }
             $x++;
         }
@@ -246,15 +244,15 @@ if ($bonus) {
         $x = 1;
         foreach($search_exploded as $search_each) {
             if($x == 1) {
-                $construct .= 'OR ((Question3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)';
+                $construct .= 'OR ((Question3 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)';
             } else {
-                $construct .= 'AND (Question3 COLLATE utf8_general_ci LIKE _utf8"%' . $search_each . '%" COLLATE utf8_general_ci)'; 
+                $construct .= 'AND (Question3 COLLATE utf8mb4_general_ci LIKE "%' . $search_each . '%" COLLATE utf8mb4_general_ci)'; 
             }
             $x++;
         }
         $construct .= ")";
 
-        $construct .= 'OR Intro COLLATE utf8_general_ci LIKE _utf8"%' . $search . '%" COLLATE utf8_general_ci';
+        $construct .= 'OR Intro COLLATE utf8mb4_general_ci LIKE "%' . $search . '%" COLLATE utf8mb4_general_ci';
     }
 
     $constructs = "SELECT * FROM bonusesdb WHERE ($construct) $categquery $subcategquery $difquery $tournamentquery ORDER BY `Year` DESC,`Tournament` ASC,`Round` ASC,`Question #` ASC";
