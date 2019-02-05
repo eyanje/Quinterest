@@ -5,7 +5,7 @@ CREATE TABLE tossupsdbnew(
     Subcategory varchar(255) NOT NULL,
     `Question #` int unsigned NOT NULL,
     Difficulty varchar(255) NOT NULL,
-    Question varchar(255) NOT NULL,
+    Question varchar(1024) NOT NULL,
     Round int unsigned NOT NULL,
     Tournament varchar(255) NOT NULL,
     Year int unsigned NOT NULL,
