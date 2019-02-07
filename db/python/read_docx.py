@@ -4,9 +4,13 @@ import io
 import urllib.request
 
 def read_docx(path):
-    with urllib.request.urlopen(path) as file:
-            document = Document(io.BytesIO(file.read()))
-            return document.paragraphs
+    path = '%20'.join(path.split(' '))
+    try:
+        with urllib.request.urlopen(path) as file:
+                document = Document(io.BytesIO(file.read()))
+                return document.paragraphs
+    except urllib.error.HTTPError as error:
+        print(f'Error loading docx {path}: {error}')
 
 def extract_texts(paragraphs):
     texts = []
