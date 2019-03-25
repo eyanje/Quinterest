@@ -1,5 +1,5 @@
-
-def split_question_answers(texts):
+def parse_tossup(texts):
+    """Returns a list of questions and answers, stored as tuples"""
     question_answers = []
     for i in range(len(texts)):
         text = texts[i].upper()
@@ -18,3 +18,4 @@ def split_question_answers(texts):
                 break
             question_answers.append((question, answer))
     return question_answers
+
