@@ -1,7 +1,9 @@
 import database
-import read_docx
-import read_tossup
+import parse_question
+import read_file
 import url_browser
+
+# This module loads up multiple tournaments from the base page and loads them into the document
 
 base_links = url_browser.load_base_page()
 
@@ -19,31 +21,32 @@ for tournament_name, tournament_link in base_links:
     for doc_name, doc_link in url_browser.load_tournament_links(tournament_link):
         # If doc or docx file, parse with Document
 
-        if (doc_name[-3:] == 'doc' or doc_name[-4:] == 'docx'):
+        if (doc_name.split('.')[-1] in ('doc', 'docx')):
             # Read paragraphs
-            paragraphs = read_docx.read_docx(doc_link)
+            paragraphs = read_file.read_docx(doc_link)
 
-            # Extract pieces of text
-            texts = read_docx.extract_texts(paragraphs)
-            frequencies = read_docx.frequency_dict(paragraphs)
-            question_answers = read_tossup.split_question_answers(texts)
-
-            # Extract questions and answers from text
-            for i in range(len(question_answers)):
-                question,answer = question_answers[i]
-                database.add_tossup(
-                    answer,
-                    doc_info.subject,
-                    'Pigeonology', # Subsubject
-                    i + 1, # Question Number
-                    doc_info.difficulty, # Difficulty
-                    question,
-                    1, # Round
-                    doc_info.name,
-                    doc_info.year)
-
-        else:
-            print('PDFs not supported')
+        elif (doc_name.split('.')[-1] == 'pdf'):
+            print('PDFs are not supported')
+            paragraphs = read_file.read_pdf(doc_link)
         
+        # Extract pieces of text
+        texts = read_file.extract_texts(paragraphs)
+        frequencies = read_file.frequency_dict(paragraphs)
+        question_answers = parse_question.parse_tossup(texts)
+
+        # Input all questions ans answers
+        # Extract questions and answers from text
+        for i,question,answer in enumerate(question_answers):
+            database.add_tossup(
+                answer,
+                doc_info.subject,
+                'Pigeonology', # Subsubject
+                i + 1, # Question Number
+                doc_info.difficulty, # Difficulty
+                question,
+                1, # Round
+                doc_info.name,
+                doc_info.year)
+
 database.cursor.close()
 
