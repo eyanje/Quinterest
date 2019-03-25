@@ -1,7 +1,7 @@
 # Quinterest (PHP7)
 A Searchable Quizbowl Database, updated for modern standards
 
-## Installation
+## Apache Installation
 
 Clone the repository
 ```
@@ -24,6 +24,10 @@ apt-get install php libapache2-mod-php php-mcrypt php-mysql a2enmod proxy_fcgi s
 
 Start apache with `service start apache2`
 Quinterest should now be running at `http://localhost/`
+
+## Quickstart Server
+
+Run `.\start.bat` to start the php server at localhost.
 
 ## Creating the database
 
