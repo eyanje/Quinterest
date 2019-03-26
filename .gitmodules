@@ -1,0 +1,3 @@
+[submodule "QuizBug"]
+	path = QuizBug
+	url = https://github.com/quid256/QuizBug
