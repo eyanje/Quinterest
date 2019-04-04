@@ -1,4 +1,4 @@
-scripts\downloadquizbug.bat
-scripts\setupdb.bat
-scripts\setuppython.bat
-scripts\historybowl.bat
+call scripts\downloadquizbug.bat
+call scripts\setupdb.bat
+call scripts\setuppython.bat
+call scripts\historybowl.bat
