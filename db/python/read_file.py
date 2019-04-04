@@ -1,7 +1,7 @@
 from docx import Document
 from PyPDF2 import PdfFileReader
 
-import io
+import io, os
 import urllib.request, urllib.parse
 
 # This module reads text from docx and pdf files
@@ -9,15 +9,23 @@ import urllib.request, urllib.parse
 def read_docx(path):
     # path = urllib.parse.quote(path)
     try:
-        with urllib.request.urlopen(path) as file:
-            document = Document(io.BytesIO(file.read()))
+        if (path.startswith('C:')):
+            with open(path, 'rb') as file:
+                document = Document(file)
+        else:
+            with urllib.request.urlopen(path) as file:
+                document = Document(io.BytesIO(file.read()))
     except urllib.error.HTTPError as error:
         print(f'Error loading docx {path}: {error}')
         return None
     except ValueError:
         with open(path, 'rb') as file:
             document = Document(file)
-    return document.paragraphs
+    except FileNotFoundError:
+        print(f'{path} not found!')
+        document = None
+    if document != None:
+        return document.paragraphs
 
 def read_pdf(path):
     # path = urllib.parse.quote(path)
@@ -32,9 +40,12 @@ def read_pdf(path):
 
 def extract_texts(paragraphs):
     texts = []
-    for paragraph in paragraphs:
-        if (len(paragraph.text) > 2):
-            texts.append(paragraph.text)
+    if (paragraphs == None):
+        return None
+    else:
+        for paragraph in paragraphs:
+            if (len(paragraph.text) > 2):
+                texts.append(paragraph.text)
     return texts
 
 def frequency_dict(paragraphs):

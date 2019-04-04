@@ -7,4 +7,4 @@ unzip -o -q -d . QuizBug.zip
 move /Y QuizBug-master QuizBug
 del QuizBug.zip
 
-localizequizbug.vbs
+scripts\localizequizbug.vbs

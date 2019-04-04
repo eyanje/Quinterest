@@ -1,0 +1,8 @@
+db/python/__pycache__
+db/python/history_bowl/*.pdf
+db/python/history_bowl/*.docx
+
+lib/
+Scripts/
+tcl/
+pyvenv.cfg

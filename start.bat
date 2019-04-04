@@ -1,3 +1,3 @@
 @echo off
 
-.\startquinterest.bat | .\startquizbug.bat
+scripts\startquinterest.bat | scripts\startquizbug.bat

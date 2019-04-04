@@ -3,20 +3,24 @@ import parse_question
 import database
 import re,sys
 
+print(f'Opening {sys.argv[1]}')
+
 texts = read_file.extract_texts(read_file.read_docx(sys.argv[1]))
 
-year = re.search(r'([1-3][0-9][0-9][0-9])', sys.argv[1])[0]
+if texts:
 
-subject = input('Subject: ')
-subsubject = input('Subsubject: ')
-difficulty = input('Difficulty: ')
-name = input('Tournament Name: ')
+    year = re.search(r'([1-3][0-9][0-9][0-9])', sys.argv[1])[0]
 
-tournament = parse_question.parse_tossup(texts)
+    subject = input('Subject: ')
+    subsubject = input('Subsubject: ')
+    difficulty = input('Difficulty: ')
+    name = input('Tournament Name: ')
 
-for round in tournament:
-    for i,tossup in enumerate(round):
-        database.add_tossup(
+    tournament = parse_question.parse_tossup(texts)
+
+    for round in tournament:
+        for i,tossup in enumerate(round):
+            database.add_tossup(
                 tossup.answer,
                 subject,
                 subsubject, # Subsubject
