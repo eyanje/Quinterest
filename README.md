@@ -1,6 +1,19 @@
 # Quinterest (PHP7)
 A Searchable Quizbowl Database, updated for modern standards
 
+## Prerequesites
+
+- [PHP](https://www.php.net/)
+- [Node.js](https://nodejs.org/)
+- [MySQL/MariaDB](https://mariadb.org/)
+- [Python 3](https://www.python.org/)
+
+## Downloading
+
+[Download](https://github.com/eyanje/Quinterest-PHP7/archive/master.zip) and extract the zip files.
+
+Run `downloadquizbug.bat` to download QuizBug.
+
 ## Apache Installation
 
 Clone the repository
