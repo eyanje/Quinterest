@@ -11,9 +11,13 @@ def read_docx(path):
     try:
         with urllib.request.urlopen(path) as file:
             document = Document(io.BytesIO(file.read()))
-            return document.paragraphs
     except urllib.error.HTTPError as error:
         print(f'Error loading docx {path}: {error}')
+        return None
+    except ValueError:
+        with open(path, 'rb') as file:
+            document = Document(file)
+    return document.paragraphs
 
 def read_pdf(path):
     # path = urllib.parse.quote(path)
@@ -29,7 +33,8 @@ def read_pdf(path):
 def extract_texts(paragraphs):
     texts = []
     for paragraph in paragraphs:
-        texts.append(paragraph.text)
+        if (len(paragraph.text) > 2):
+            texts.append(paragraph.text)
     return texts
 
 def frequency_dict(paragraphs):
