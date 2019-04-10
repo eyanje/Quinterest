@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup
 import urllib.request
-import io
+import io, os, sys
 
 from PyPDF2 import PdfFileReader, PdfFileMerger
 
@@ -35,4 +35,28 @@ def merge_pdfs():
                 merger.append(PdfFileReader(io.BytesIO(file.read())))
         merger.write(f'{tournament_name}.pdf')
 
-merge_pdfs()
+def merge_all():
+    files = [f for f in os.listdir('.') if f.endswith('.pdf')]
+
+    merger = PdfFileMerger()
+    for path in files:
+        with open(path, 'rb') as file:
+            merger.append(PdfFileReader(file))
+    merger.write('AllMerged.pdf')
+
+def print_usage():
+    print("""PDFMerger, merges pdfs from history bowl
+
+Usage: merge_pdfs.py <-h/-a>
+
+Use -h to download all files from history bowl
+Use -a to merge all downloaded files into one pdf""")
+
+if (len(sys.argv) < 2):
+    print_usage()
+if ('-h' in sys.argv):
+    merge_pdfs()
+if ('-a' in sys.argv):
+    merge_all()
+if ('-a' not in sys.argv and '-h' not in sys.argv):
+    print_usage()
