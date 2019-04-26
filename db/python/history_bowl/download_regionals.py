@@ -94,7 +94,7 @@ def read_sets(name, link):
             print(f'No sets: {p.text}')
 
     for s in sets:
-        s.resolve_links(name)
+        s.resolve_links(f'Regionals/{name}')
 
 def read_home():
     req = get_request('https://www.historybowl.com/resources/study-guides-resources/')
@@ -109,6 +109,4 @@ def read_home():
     for link in links:
         read_sets(link.text, link['href'])
 
-
-home_links = read_home()
-
+read_home()
