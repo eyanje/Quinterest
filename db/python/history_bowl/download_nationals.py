@@ -54,7 +54,7 @@ class NationalTournament:
         self.load()
     def load(self):
         with urlopen(get_request(self.url)) as page:
-            soup = BeautifulSoup(page, features='lxml')
+            soup = BeautifulSoup(page, 'html.parser')
         div = soup.find('div', class_='wprt-container bg-even-rows')
         
         links = div.find_all('a', href=True)
@@ -79,7 +79,7 @@ class NationalTournament:
     
 def load_home():
     with urlopen(get_request('https://www.historybowl.com/resources/study-guides-resources/')) as home:
-        soup = BeautifulSoup(home, features='lxml')
+        soup = BeautifulSoup(home, 'html.parser')
     links = soup.find_all('a', text=re.compile('.*Nationals Question Sets.*'), href=True)
 
     tournaments = list()

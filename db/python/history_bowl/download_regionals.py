@@ -77,7 +77,7 @@ def get_set_type(p):
 def read_sets(name, link):
     print(f'Reading {name}')
     with urlopen(get_request(link)) as page:
-        soup = BeautifulSoup(page, features="lxml")
+        soup = BeautifulSoup(page, 'html.parser')
     div = soup.find('div', class_='wprt-container bg-even-rows')
 
     sets = list()
@@ -99,7 +99,7 @@ def read_sets(name, link):
 def read_home():
     req = get_request('https://www.historybowl.com/resources/study-guides-resources/')
     with urlopen(req) as home:
-        soup = BeautifulSoup(home, features="lxml")
+        soup = BeautifulSoup(home, 'html.parser')
     
     links = soup.find_all('a')
     links = list(filter(lambda link: 'Regional and State Tournament Question Sets' in link.text, links))
